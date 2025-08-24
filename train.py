@@ -17,7 +17,6 @@ import config
 import wandb
 from data_loader import train_loader, val_loader
 from models import get_model
-from utils import noise_tensor
 
 random.seed(config.SEED)
 np.random.seed(config.SEED)
@@ -54,6 +53,7 @@ param_groups = [
         "lr": config.LR,
     },
 ]
+
 optimizer = torch.optim.AdamW(param_groups, lr=config.LR)
 
 # LR scheduler

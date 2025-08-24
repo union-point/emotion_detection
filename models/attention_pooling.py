@@ -21,26 +21,28 @@ class AttentionPooling(nn.Module):
 class AttentionPoolingModel(nn.Module):
     def __init__(self, num_labels=7, dropout=0.1):
         super().__init__()
-        self.bert = RobertaModel.from_pretrained(config.BERT_MODEL)
-        self.wav2vec = Wav2Vec2Model.from_pretrained(config.W2V_MODEL)
+        self.text_encoder = RobertaModel.from_pretrained(config.BERT_MODEL)
+        self.audio_encoder = Wav2Vec2Model.from_pretrained(config.W2V_MODEL)
 
-        self.text_pool = AttentionPooling(self.bert.config.hidden_size)
-        self.audio_pool = AttentionPooling(self.wav2vec.config.hidden_size)
+        self.text_pool = AttentionPooling(self.text_encoder.config.hidden_size)
+        self.audio_pool = AttentionPooling(self.audio_encoder.config.hidden_size)
 
         self.dropout = nn.Dropout(dropout)
         self.classifier = nn.Linear(
-            self.bert.config.hidden_size + self.wav2vec.config.hidden_size, num_labels
+            self.text_encoder.config.hidden_size
+            + self.audio_encoder.config.hidden_size,
+            num_labels,
         )
 
     def forward(
         self, input_ids, attention_mask, audio_inputs, audio_attention_mask=None
     ):
-        text_hidden = self.bert(
+        text_hidden = self.text_encoder(
             input_ids=input_ids, attention_mask=attention_mask
         ).last_hidden_state
         text_emb = self.text_pool(text_hidden)
 
-        audio_hidden = self.wav2vec(
+        audio_hidden = self.audio_encoder(
             audio_inputs, attention_mask=audio_attention_mask
         ).last_hidden_state
         audio_emb = self.audio_pool(audio_hidden)

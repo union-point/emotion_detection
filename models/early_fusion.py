@@ -9,28 +9,30 @@ class EarlyFusion(nn.Module):
     def __init__(self, num_labels=7):
         super().__init__()
         # text encoder
-        self.bert = RobertaModel.from_pretrained(config.BERT_MODEL)
+        self.text_encoder = RobertaModel.from_pretrained(config.BERT_MODEL)
         # audio encoder
-        self.wav2vec = Wav2Vec2Model.from_pretrained(config.W2V_MODEL)
+        self.audio_encoder = Wav2Vec2Model.from_pretrained(config.W2V_MODEL)
 
         # classifier
         self.dropout = nn.Dropout(0.1)
         self.classifier = nn.Linear(
-            self.bert.config.hidden_size + self.wav2vec.config.hidden_size, num_labels
+            self.text_encoder.config.hidden_size
+            + self.audio_encoder.config.hidden_size,
+            num_labels,
         )
 
     def forward(
         self, input_ids, attention_mask, audio_inputs, audio_attention_mask=None
     ):
         # text forward
-        bert_out = self.bert(input_ids=input_ids, attention_mask=attention_mask)
+        bert_out = self.text_encoder(input_ids=input_ids, attention_mask=attention_mask)
         text_emb = bert_out.pooler_output
         # for models wich dont have pooler_output
         if text_emb is None:
             text_emb = bert_out.last_hidden_state.mean(dim=1)
 
         # audio forward
-        wav_out = self.wav2vec(audio_inputs, attention_mask=audio_attention_mask)
+        wav_out = self.audio_encoder(audio_inputs, attention_mask=audio_attention_mask)
         audio_emb = wav_out.last_hidden_state.mean(dim=1)
 
         # concat

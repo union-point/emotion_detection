@@ -131,8 +131,7 @@ dmypy.json
 # TensorBoard logs
 tensorboard_logs/
 
-model/
-saved_models/
+
 trained_models/
 wandb/
 .vscode/

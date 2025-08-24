@@ -62,12 +62,12 @@ class CrossAttentionFusion(nn.Module):
 class FineGrainedFusion(nn.Module):
     def __init__(self, num_labels=7, dropout=0.1, hidden_dim=256):
         super().__init__()
-        self.bert = RobertaModel.from_pretrained(config.BERT_MODEL)
-        self.wav2vec = Wav2Vec2Model.from_pretrained(config.W2V_MODEL)
+        self.text_encoder = RobertaModel.from_pretrained(config.BERT_MODEL)
+        self.audio_encoder = Wav2Vec2Model.from_pretrained(config.W2V_MODEL)
 
         self.fusion = CrossAttentionFusion(
-            text_dim=self.bert.config.hidden_size,
-            audio_dim=self.wav2vec.config.hidden_size,
+            text_dim=self.text_encoder.config.hidden_size,
+            audio_dim=self.audio_encoder.config.hidden_size,
             hidden_dim=hidden_dim,
         )
 
@@ -89,11 +89,11 @@ class FineGrainedFusion(nn.Module):
         self, input_ids, attention_mask, audio_inputs, audio_attention_mask=None
     ):
         # text encoding
-        text_hidden = self.bert(
+        text_hidden = self.text_encoder(
             input_ids=input_ids, attention_mask=attention_mask
         ).last_hidden_state
         # audio encoding
-        audio_hidden = self.wav2vec(
+        audio_hidden = self.audio_encoder(
             audio_inputs, attention_mask=audio_attention_mask
         ).last_hidden_state
         print("audio_hidden", audio_hidden.shape)
