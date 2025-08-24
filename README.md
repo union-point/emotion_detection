@@ -3,8 +3,22 @@
 This project focuses on detecting human emotions by analyzing multiple data sources. It goes beyond traditional methods that only look at one type of data, such as facial expressions or voice tone, by combining information from several modalities.
 
 ## Repository Structure
+```
+.
+├── config.py
+├── data_loader.py
+├── inference.py
+├── models
+│   ├── attention_pooling.py
+│   ├── early_fusion.py
+│   ├── fine_grained_fusion.py
+│   ├── __init__.py
+│   ├── memocmt.py
+├── README.md
+├── saved_models
+├── train.py
+```
 
-This is the potential structure of the repository:
 
 
 ## Installing the dependencies
@@ -31,12 +45,9 @@ python train.py
 
 4. If you want to continue model training from a saved model (only weights), you can download an example
    from [here](https://drive.google.com/drive/folders/1zMsgI35nwuV7eNUIpt4NDGALaYJShE1S?usp=sharing) and
-   place the content inside a `saved_model` folder)
-   for another 10 epochs with data augmentation (not supported yet) you can run the following script:
+   place the content inside a `saved_model` folder
 
-```bash
-python train.py --model_name=Unet_vgg16  --checkpoint=saved_model/model_name.pt 
-```
+
 
 ## Inference
 
